@@ -1,0 +1,56 @@
+.TH RICH-CORE-EXTRACT 1 "2008-04-02" "sp-rich-core"
+.SH NAME
+rich-core-extract \- extract core dump or oopslog and metadata from a rich core
+.SH SYNOPSIS
+.B rich-core-extract
+.I filename [outputdir]
+.SH DESCRIPTION
+.B rich-core-extract
+extracts the original core dump or kernel oopslog and additional metadata
+(syslog etc.) from a rich core file. If only
+.I filename
+is given, a new directory of the same name without the
+.B .rcore.lzo
+extension is created
+and rich core contents are extracted there.
+.PP
+If
+.I filename
+does not have a
+.B .rcore.lzo
+extension (
+.B .rcore
+is also accepted as it was used by older versions),
+specify output directory in
+.IR outputdir .
+.PP
+For safety,
+.B rich-core-extract
+always checks that
+.I outputdir
+is not an existing directory.
+.SH EXAMPLES
+.nf
+.B rich-core-extract ./browser\-11\-2260.rcore.lzo
+
+.fi
+Creates a new directory
+.B ./browser\-11\-2260
+and extracts rich core
+contents as multiple files there. For example, the regular core dump
+can be found at
+.B ./browser\-11\-2260/coredump
+.
+.SH EXIT STATUS
+.B rich-core-extract
+exits with status 0 if no errors were encountered. On error,
+.B rich-core-extract
+exits with status 1 and prints an error message on stderr.
+.SH SEE ALSO
+rich-core-dumper(1)
+.SH COPYRIGHT
+Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+.PP
+This is free software.  You may redistribute copies of it under the
+terms of the GNU General Public License v2 included with the software.
+There is NO WARRANTY, to the extent permitted by law.

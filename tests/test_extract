@@ -1,0 +1,139 @@
+#!/bin/sh
+
+_disable_rich_core_dumper()
+{
+  # disable rich core dumper
+  if [ -e /etc/init.d/rich-core-pattern ]; then
+    /etc/init.d/rich-core-pattern stop
+  fi
+  if [ -e /etc/init.d/rich-core-dumps ]; then
+    /etc/init.d/rich-core-dumps stop
+  fi  
+}
+
+_enable_rich_core_dumper()
+{
+  # enable
+  if [ -e /etc/init.d/rich-core-pattern ]; then
+    /etc/init.d/rich-core-pattern start
+  fi
+  if [ -e /etc/init.d/rich-core-dumps ]; then
+    /etc/init.d/rich-core-dumps start
+  fi
+}
+
+_disable_rich_core_dumper
+
+rm -f /home/user/MyDocs/core-dumps/sleep*.core
+
+# generate a coredump
+su -c 'sleep 59&' user
+sleep 1
+pid=$(ps ax | grep 'sleep 59' | grep -v grep | awk -F' ' '{print $1}')
+echo "Killing pid $pid"
+kill -SEGV $pid
+sleep 3
+
+_enable_rich_core_dumper
+
+coredump=$(find /home/user/MyDocs/core-dumps -name "sleep-11-${pid}-.core")
+
+echo "Found a coredump $coredump"
+
+TESTDATADIR=/usr/share/sp-rich-core-tests/extradata
+EXTRACTDIR=./extracted
+RET=0
+
+mkdir -p ${TESTDATADIR}
+mkdir -p /etc/rich-core
+
+rm -f /etc/rich-core/sleep.extras
+rm -f ${TESTDATADIR}/*
+
+# generate binary extra files of different size
+echo "Generating binary test data to ${TESTDATADIR}"
+for n in $(seq 4000 1 4200)
+do
+    dd bs=${n} count=1 if=/dev/urandom of=${TESTDATADIR}/data${n}.bin > /dev/null 2>&1
+    echo "${TESTDATADIR}/data${n}.bin" >> /etc/rich-core/sleep.extras
+done
+
+echo "Generating text test data to ${TESTDATADIR}"
+# generate template for text extra files
+for i in $(seq 500); do echo "This is line ${i}"; done > ${TESTDATADIR}/template.txt
+echo -e "\nThis is the last line of file FILENAME" > ${TESTDATADIR}/lastline.txt
+
+# generate small text extra files
+for n in $(seq 0 1 20)
+do
+    dd bs=1 count=${n} if=${TESTDATADIR}/template.txt of=${TESTDATADIR}/data${n}.txt 2>/dev/null
+    echo "${TESTDATADIR}/data${n}.txt" >> /etc/rich-core/sleep.extras
+done
+
+# generate text extra files of different size
+for n in $(seq 3900 1 4100)
+do
+    dd bs=${n} count=1 if=${TESTDATADIR}/template.txt 2>/dev/null | cat - ${TESTDATADIR}/lastline.txt | sed -e "s|FILENAME|${TESTDATADIR}/data${n}.txt|" > ${TESTDATADIR}/data${n}.txt
+    echo "${TESTDATADIR}/data${n}.txt" >> /etc/rich-core/sleep.extras
+done
+
+echo "Listing the contents of ${TESTDATADIR}"
+ls -l ${TESTDATADIR}
+echo "--------"
+
+# use rich-core-dumper to create a rich core from coredump
+echo "Creating a rich core by using rich-core-dumper"
+rm -f /home/user/MyDocs/core-dumps/sleep*.rcore.lzo
+echo "[---rich-core: coredump---]" | cat - ${coredump} | /usr/sbin/rich-core-dumper --no-section-header --default-name sleep
+
+richcore=$(find /home/user/MyDocs/core-dumps -type f -name sleep*.rcore.lzo)
+
+if [ -f "${richcore}" ]; then
+    echo "copying ${richcore} to /usr/share/sp-rich-core-tests/extract_test.rcore.lzo"
+    cp ${richcore} /usr/share/sp-rich-core-tests/extract_test.rcore.lzo
+else
+    echo "ERROR: No rich core found"
+    RET=1
+fi
+
+# extract rich core
+rm -fr ${EXTRACTDIR}
+echo "Extracting ${richcore} to ${EXTRACTDIR}"
+if ! /usr/bin/rich-core-extract ${richcore} ${EXTRACTDIR}; then
+    echo "ERROR: rich-core-extract failed"
+    RET=1
+fi
+
+echo "Listing the contents of ${EXTRACTDIR}"
+ls -l ${EXTRACTDIR}
+echo "--------"
+
+echo "Checking files in extracted rich core"
+for orig in $(find ${TESTDATADIR} -type f \( -name 'data*.bin' -o -name 'data*.txt' \))
+do
+    name=$(basename ${orig})
+    if [ -f ${EXTRACTDIR}/${name} ]; then
+	if diff -q ${orig} ${EXTRACTDIR}/${name}; then
+	    :
+	    #echo "Test passed with file ${name}"
+	else
+	    echo "ERROR: Files ${orig} and ${EXTRACTDIR}/${name} differ"
+	    RET=1
+	fi
+    else
+	echo "ERROR: ${EXTRACTDIR}/${name} : no such file"
+	RET=1
+    fi
+done
+
+# clean test data and extracted data
+rm -f /etc/rich-core/sleep.extras
+rm -f ${TESTDATADIR}/*
+rm -fr ${EXTRACTDIR}
+
+if [ $RET -eq 0 ]; then
+    echo "rich-core-extract test PASSED"
+else
+    echo "rich-core-extract test FAILED"
+    exit 1
+fi

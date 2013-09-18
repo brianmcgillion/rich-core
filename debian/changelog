@@ -1,0 +1,983 @@
+sp-rich-core (1.69.2-1) unstable; urgency=low
+
+  * Fixes: NB#289448 - [TASK] Add OneNAND vendor ID and device HWID into the crash report package's file name
+
+ -- Joonas Kylänpää <ext-joonas.kylanpaa@nokia.com>  Fri, 16 Dec 2011 14:01:17 +0200
+
+sp-rich-core (1.69.1-1) unstable; urgency=low
+
+  * Add OneNAND vendor ID and device HWID into the crash report package's file name
+
+ -- Joonas Kylänpää <ext-joonas.kylanpaa@nokia.com>  Thu, 10 Nov 2011 14:01:05 +0200
+
+sp-rich-core (1.69.0-1) unstable; urgency=low
+
+  * Fixes: NB#279034 - Include syslog.old in addition to syslog file in rich cores
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Wed, 28 Sep 2011 10:31:47 +0300
+
+sp-rich-core (1.68.0-1) unstable; urgency=low
+
+  * Fixes: NB#282591 - Added aegis manifest for sp-rich-core to enable replacing of files under /etc/init.d when upgrading
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Fri, 16 Sep 2011 12:28:44 +0300
+
+sp-rich-core (1.67.3-1) unstable; urgency=low
+
+  * Fixes: NB#266095 - Crash reporter can corrupt core dumps so that CoreWeb cannot process them
+
+ -- Joonas Kylänpää <ext-joonas.kylanpaa@nokia.com>  Mon, 12 Sep 2011 15:29:46 +0300
+
+sp-rich-core (1.67.2-1) unstable; urgency=low
+
+  * Fixes: NB#263432 - New feaure, disable core reducing based on core name
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Fri, 09 Sep 2011 13:02:00 +0300
+
+sp-rich-core (1.67.1-1) unstable; urgency=low
+
+  * Fixes: NB#243569 - Core reducer corrupts certain cores (e.g. fenix)
+  
+ -- Carol Rus <ext-carol.rus@nokia.com>  Tue, 25 May 2011 10:24:00 +0300
+
+sp-rich-core (1.66.1-2) unstable; urgency=low
+
+  * Updated build number
+  
+ -- Carol Rus <ext-carol.rus@nokia.com>  Thu, 20 May 2011 16:38:00 +0300
+
+sp-rich-core (1.66.1-1) unstable; urgency=low
+
+  * Fixes: NB#207709 - sp-rich-core does unnecessary sysinfoclient output parsing 
+  * Temporary fix for core corruption by blacklisting core-reducer's action on specific applications
+  
+ -- Carol Rus <ext-carol.rus@nokia.com>  Thu, 19 May 2011 15:04:00 +0300
+
+sp-rich-core (1.66.0-2) unstable; urgency=low
+
+  * Update build number
+  
+ -- Carol Rus <ext-carol.rus@nokia.com>  Mon, 04 Apr 2011 12:55:00 +0300
+
+sp-rich-core (1.66.0-1) unstable; urgency=low
+
+  * Fixes: NB#238895 - [TASK] [FEA] kernel oops trace upload for Harmattan requested -- Device side
+  * Fixes: NB#235492 - sp-rich-core not buildable with gcc-4.5
+  
+ -- Carol Rus <ext-carol.rus@nokia.com>  Mon, 04 Apr 2011 12:27:00 +0300
+
+sp-rich-core (1.65.3-1) unstable; urgency=low
+
+  * Fixes: NB#206215 - rich-core-pattern fails mkdir during boot
+  * Fixes: NB#207709 - sp-rich-core does unnecessary sysinfoclient output parsing 
+
+ -- Carol Rus <ext-carol.rus@nokia.com>  Tue, 23 Mar 2011 11:22:00 +0200
+
+sp-rich-core (1.65.2-1) unstable; urgency=low
+
+  * Fixes: NB#237570 - Add code to ignore duplicates handling in tests 
+
+ -- Carol Rus <ext-carol.rus@nokia.com>  Thu, 17 Mar 2011 12:24:00 +0200
+
+sp-rich-core (1.65.1-2) unstable; urgency=low
+
+  * Updated build number
+
+ -- Carol Rus <ext-carol.rus@nokia.com>  Thu, 17 Feb 2011 17:23:00 +0200
+
+sp-rich-core (1.65.1-1) unstable; urgency=low
+
+  * Fixes: NB#223843 - sp-rich-core should depend on sysinfoclient
+
+ -- Carol Rus <ext-carol.rus@nokia.com>  Tue, 01 Feb 2011 10:30:00 +0200
+
+sp-rich-core (1.65.0-1) unstable; urgency=low
+
+  * Fixes: NB#202907 - Binary extra file support for rich core tools
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Tue, 16 Nov 2010 16:46:07 +0200
+
+sp-rich-core (1.64.1-1) unstable; urgency=low
+
+  * Fixes: NB#201858 - sp-rich-core does not put all possible xomap log files into rich-core
+  * Fixes: NB#203656 - init.d/rich-core-dumps makes reference to deprecated /proc/bootreason
+  * Wildcard support for filenames listed in rich core extra files
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Wed, 10 Nov 2010 10:35:26 +0200
+
+sp-rich-core (1.64.0-1) unstable; urgency=low
+
+  * Fixes: NB#195363 - Process command line args in "cmdline" are not shown
+  * Fixes: NB#198233 - [FEA] Additional (log)files to rich-core dump
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Wed, 03 Nov 2010 12:54:53 +0200
+
+sp-rich-core (1.63.17-1) unstable; urgency=low
+
+  * Fixes: NB#200826 - rich-core-dumper refers to deprecated /proc/component_version
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Fri, 29 Oct 2010 14:37:18 +0300
+
+sp-rich-core (1.63.16-1) unstable; urgency=low
+
+  * Fixes: NB#189809 - COREWEB: /usr/bin/invoker 'nanosleep __sleep main'
+  * Rich-cores are not created for invoker
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Thu, 14 Oct 2010 10:35:54 +0300
+
+sp-rich-core (1.63.15-1) unstable; urgency=low
+
+  * Fixes: NB#187683 - sp-rich-core: add autoconf to build-deps
+  * Fixes: NB#191415 - Improvements for querying device IMEI code
+  * Reverted using sysinfod/sysinfoclient for obtaining SW release version
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Wed, 15 Sep 2010 14:18:54 +0300
+
+sp-rich-core (1.63.14-1) unstable; urgency=low
+
+  * Fixes: NB#189324 - Refactor rich-core-dumper script
+  * Fixes: NB#189319 - Duplicate functionality in rich-core-dumper script
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Tue, 07 Sep 2010 11:18:13 +0300
+
+sp-rich-core (1.63.13-1) unstable; urgency=low
+
+  * Implemented: SWP#MTT-392 - Memory usage checking to crash-reporter
+  * When core reducing is enabled space left on device is checked before writing 
+    temporary coredump. In case of errors, file rich-core-errors is included in
+    rich-core file.
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Tue, 24 Aug 2010 14:46:18 +0300
+
+sp-rich-core (1.63.12-1) unstable; urgency=low
+
+  * Implemented: SWP#MTT-371
+  * Performance improvement for rich-core-dumper: output of core-reducer is
+    piped directly to lzop file compressor instead of using a temporary file.
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Wed, 11 Aug 2010 09:38:08 +0300
+
+sp-rich-core (1.63.11-1) unstable; urgency=low
+
+  * Fixes: NB#180480
+  * Dump to temporary file in /var/tmp workaround was removed by restoring the
+    original functionality
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Fri, 06 Aug 2010 09:14:31 +0300
+
+sp-rich-core (1.63.10-1) unstable; urgency=low
+
+  * Fixes: NB#180480 - Core dumps not generated for launched applications that segfault
+  * Added check that MyDocs is mounted to vfat before trying write to it
+  * Will not dump processes using more than 500M virtual memory
+  * Removed obsolete check for maemo-invoker
+  * Dump first to /var/tmp if threre is space and then mv to MyDocs
+  * Traces to syslog when dumping fails
+	
+ -- Sampo Saaristo <ext-sampo.2.saaristo@nokia.com>  Thu, 29 Jul 2010 13:27:37 +0300
+
+sp-rich-core (1.63.9-1) unstable; urgency=low
+
+  * Fixes: NB#171721 - rich-core (Upstart) startup scripts are missing stop functionality
+
+ -- Timo Härkönen <ext-timo.p.harkonen@nokia.com>  Tue, 20 Jul 2010 16:15:23 +0300
+
+sp-rich-core (1.63.8-1) unstable; urgency=low
+
+  * Fixes: NB#176275 - qmafw-dbus-wrapper dump fails
+  * rich-core-dumber uses the -name argument from core-pattern
+  * dump normal core instead of reduced if the path to crashed executable 
+    can not be obtained from /proc
+
+ -- Sampo Saaristo <ext-sampo.2.saaristo@nokia.com>  Tue, 13 Jul 2010 14:09:53 +0300
+
+sp-rich-core (1.63.7-1) unstable; urgency=low
+
+  * Added dependency to sysinfod
+
+ -- Sampo Saaristo <ext-sampo.2.saaristo@nokia.com>  Fri, 09 Jul 2010 10:45:19 +0300
+
+sp-rich-core (1.63.6-1) unstable; urgency=low
+
+  * Fixes: NB#177660 - osso-product-info file in rich-core is empty
+  * rich-core-dumper uses sysinfoclient instead of sysinfo-tool
+
+ -- Sampo Saaristo <ext-sampo.2.saaristo@nokia.com>  Wed, 07 Jul 2010 13:20:21 +0300
+
+sp-rich-core (1.63.5-1) unstable; urgency=low
+
+  * Continue rich-core dumping even if sysinfo not available
+
+ -- Sampo Saaristo <ext-sampo.2.saaristo@nokia.com>  Tue, 06 Jul 2010 12:23:23 +0300
+
+sp-rich-core (1.63.4-1) unstabke; urgency=low
+
+  * Fixes: NB#177660 - osso-product-info file in rich-core is empty
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Mon, 05 Jul 2010 09:25:01 +0300
+
+sp-rich-core (1.63.3-1) unstable; urgency=low
+
+  * Fixes: NB#165013 - 2 core-dump locations is too much 
+
+ -- Riku Halonen <riku.halonen@nokia.com>  Fri, 07 May 2010 11:23:35 +0300
+
+sp-rich-core (1.63.2-1) unstable; urgency=low
+
+  * Implemented: SWP#MTT-253
+  * Fixed rich-core filtering and implemented a filter test
+
+ -- Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>  Mon, 26 Apr 2010 15:12:56 +0300
+
+sp-rich-core (1.63.1-1) unstable; urgency=low
+
+  * kernel.core_pattern set using sysctl command.
+
+ -- Riku Halonen <riku.halonen@nokia.com>  Mon, 22 Mar 2010 10:06:34 +0200
+
+sp-rich-core (1.63.0-3) unstable; urgency=low
+
+  * A typo in log output is fixed.
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Mon, 22 Feb 2010 09:24:39 +0200
+
+sp-rich-core (1.63.0-2) unstable; urgency=low
+
+  * Some comments are cleaned.
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Mon, 22 Feb 2010 09:10:08 +0200
+
+sp-rich-core (1.63.0-1) karmic; urgency=low
+
+  * Changelog and tag update.
+
+ -- Riku Halonen <riku.halonen@nokia.com>  Tue, 16 Feb 2010 11:01:56 +0200
+
+sp-rich-core (1.63.0) karmic; urgency=low
+
+  * Syncing tags and version numbering.
+
+ -- Sampo Saaristo <ext-sampo.1.saaristo@nokia.com>  Tue, 16 Feb 2010 10:18:14 +0200
+
+sp-rich-core (1.53.46) unstable; urgency=low
+
+  * The setting --name switch also from rich-core-patten 
+
+ -- Sampo Saaristo <ext-sampo.1.saaristo@nokia.com>  Tue, 09 Feb 2010 17:17:03 +0200
+
+sp-rich-core (1.53.45) unstable; urgency=low
+
+  * Test for rich core pattern updated (-e switch in pattern)
+
+ -- Sampo Saaristo <ext-sampo.1.saaristo@nokia.com>  Tue, 09 Feb 2010 15:58:08 +0200
+
+sp-rich-core (1.53.44) unstable; urgency=low
+
+  * Fixes to test_script and tests.xml (merge testfix)
+
+ -- Sampo Saaristo <ext-sampo.1.saaristo@nokia.com>  Tue, 09 Feb 2010 14:23:38 +0200
+
+sp-rich-core (1.53.43) unstable; urgency=low
+
+  * Modified Log file message.
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Wed, 03 Feb 2010 09:38:49 +0200
+
+sp-rich-core (1.53.42) unstable; urgency=low
+
+  * Fixed _free_space() from fremantle version does not work in harmattan.
+
+ -- Sampo Saaristo <ext-sampo.1.saaristo@nokia.com>  Tue, 02 Feb 2010 15:07:13 +0200
+
+sp-rich-core (1.53.41) unstable; urgency=low
+
+  * Fixed rich_core_pattern duplicate value Author
+  * Fixed bash style equality in sh script
+  * Fixes NB#150133 -  Harmattan sp-rich-core misses improvements from the Fremantle versio 
+
+ -- Sampo Saaristo <ext-sampo.1.saaristo@nokia.com>  Tue, 02 Feb 2010 12:44:54 +0200
+
+sp-rich-core (1.53.40) unstable; urgency=low
+
+  * Test script for checking a real core dumping is updated
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Fri, 29 Jan 2010 09:29:44 +0200
+
+sp-rich-core (1.53.39) unstable; urgency=low
+
+  * Splitted init and startup scripts into two parts (pattern and dumps) #150133
+
+ -- Sampo Saaristo <ext-sampo.1.saaristo@nokia.com>  Thu, 28 Jan 2010 20:15:25 +0200
+
+sp-rich-core (1.53.38) unstable; urgency=low
+
+  * Test script minor fix related to internal testing
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Wed, 27 Jan 2010 16:45:29 +0200
+
+sp-rich-core (1.53.37) unstable; urgency=low
+
+  * Test script is changed to do a real core reducing test
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Wed, 27 Jan 2010 16:11:41 +0200
+
+sp-rich-core (1.53.36) unstable; urgency=low
+
+  * Test script is fixed
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Wed, 27 Jan 2010 15:03:43 +0200
+
+sp-rich-core (1.53.35) unstable; urgency=low
+
+  * Test definition file is reverted back
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Wed, 27 Jan 2010 13:31:20 +0200
+
+sp-rich-core (1.53.34) unstable; urgency=low
+
+  * Test config changes to check device and scratchbox also
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Wed, 27 Jan 2010 12:46:48 +0200
+
+sp-rich-core (1.53.33) unstable; urgency=low
+
+  * Read core reducer work test is added
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Wed, 27 Jan 2010 12:18:34 +0200
+
+sp-rich-core (1.53.32) unstable; urgency=low
+
+  * Modified Coverage flags in configure.ac 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 26 Jan 2010 16:04:19 +0200
+
+sp-rich-core (1.53.31) Unstable; urgency=low
+
+  * Added ElfCoreReader unit tests 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 26 Jan 2010 12:26:06 +0200
+
+sp-rich-core (1.53.30) unstable; urgency=low
+
+  * Changed Modified the Makefile commands 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 26 Jan 2010 10:13:18 +0200
+
+sp-rich-core (1.53.29) karmic; urgency=low
+
+  * Added More unit tests and Makefile cleanup 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 26 Jan 2010 09:57:41 +0200
+
+sp-rich-core (1.53.28) unstable; urgency=low
+
+  * Added Inital unit test framework 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Mon, 25 Jan 2010 13:46:29 +0200
+
+sp-rich-core (1.53.27) unstable; urgency=low
+
+  * Tagging as version 1.6.0 for release 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Fri, 22 Jan 2010 11:58:24 +0200
+
+sp-rich-core (1.53.26) unstable; urgency=low
+
+  * Added default base test script for unit tests 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Fri, 22 Jan 2010 10:50:01 +0200
+
+sp-rich-core (1.53.25) unstable; urgency=low
+
+  * Change environments scope changed 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Fri, 22 Jan 2010 08:33:28 +0200
+
+sp-rich-core (1.53.24) unstable; urgency=low
+
+  * Change Use double quotes for string literal 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 21 Jan 2010 16:04:34 +0200
+
+sp-rich-core (1.53.23) unstable; urgency=low
+
+  * Change Use the environments tag in tests.xml to run only on device.
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 21 Jan 2010 15:35:40 +0200
+
+sp-rich-core (1.53.22) unstable; urgency=low
+
+  * Change Fixed LSB-init-script warning 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 21 Jan 2010 14:59:56 +0200
+
+sp-rich-core (1.53.21) unstable; urgency=low
+
+  * Added Inital Acceptance tests. 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 21 Jan 2010 14:11:00 +0200
+
+sp-rich-core (1.53.20) unstable; urgency=low
+
+  * Change Config-h inclusion 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 19 Jan 2010 09:11:37 +0200
+
+sp-rich-core (1.53.19) unstable; urgency=low
+
+  * Additional test is added to check a coverage issue.
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Tue, 19 Jan 2010 09:55:25 +0200
+
+sp-rich-core (1.53.18) unstable; urgency=low
+
+  * Change Macro not returning in non-logging state 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 19 Jan 2010 09:11:37 +0200
+
+sp-rich-core (1.53.17) unstable; urgency=low
+
+  * Change Implemented binary search algorithm for addresses. 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 14 Jan 2010 15:08:56 +0200
+
+sp-rich-core (1.53.16) unstable; urgency=low
+
+  * Fix formatting errors 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 12 Jan 2010 15:07:01 +0200
+
+sp-rich-core (1.53.15) unstable; urgency=low
+
+  * Change Collect interpreter name from executable file and use this in reduced core file. 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 12 Jan 2010 15:00:36 +0200
+
+sp-rich-core (1.53.14) unstable; urgency=low
+
+  * Change fixed dpkg install problem 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 12 Jan 2010 10:35:09 +0200
+
+sp-rich-core (1.53.13) unstable; urgency=low
+
+  * Change Tidy up and logging
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Fri, 08 Jan 2010 17:38:33 +0200
+
+sp-rich-core (1.53.12) unstable; urgency=low
+
+  * Fixes NB#150578 - Unable to activate rich-core manually
+
+ -- Ville Ilvonen <ville.p.ilvonen@nokia.com>  Mon, 28 Dec 2009 09:58:39 +0200
+
+sp-rich-core (1.53.11) unstable; urgency=low
+
+  * Change Minor code cleaning
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Fri, 18 Dec 2009 10:39:06 +0200
+
+sp-rich-core (1.53.10) unstable; urgency=low
+
+  * Output core dump file size fix, "stacks only" mode is added
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Fri, 18 Dec 2009 09:54:35 +0200
+
+sp-rich-core (1.53.9) unstable; urgency=low
+
+  * Code cleaning, standardization and bug removal 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 17 Dec 2009 15:37:55 +0200
+
+sp-rich-core (1.53.8) unstable; urgency=low
+
+  * Code cleaning for the backend solution
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Thu, 17 Dec 2009 14:25:46 +0200
+
+sp-rich-core (1.53.7) unstable; urgency=low
+
+  * Improved DT_DEBUG value support (when maps file is used)
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Thu, 17 Dec 2009 13:43:41 +0200
+
+sp-rich-core (1.53.6) unstable; urgency=low
+
+  * Generation debug shared objects list from maps file is added
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Thu, 17 Dec 2009 11:28:50 +0200
+
+sp-rich-core (1.53.5) unstable; urgency=low
+
+  * Change edit man page 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 17 Dec 2009 10:49:52 +0200
+
+sp-rich-core (1.53.4) unstable; urgency=low
+
+  * Fixed lintian warning 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Wed, 16 Dec 2009 16:07:42 +0200
+
+sp-rich-core (1.53.3) unstable; urgency=low
+
+  * Change Fixed error in tests.xml 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Wed, 16 Dec 2009 10:39:10 +0200
+
+sp-rich-core (1.53.2) unstable; urgency=low
+
+  * Change Minor code cleaning fixes  
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 15 Dec 2009 21:00:44 +0200
+
+sp-rich-core (1.53.1) unstable; urgency=low
+
+  * Added to rich-core-dumper script, disabled by default (REDUCE_CORE=false)
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Tue, 15 Dec 2009 16:19:54 +0200
+
+sp-rich-core (1.53.0) unstable; urgency=low
+
+  * Change Created a package dependency from rich-core to core-reducer
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 15 Dec 2009 15:27:00 +0200
+
+sp-rich-core (1.52.10) unstable; urgency=low
+
+  * Change Removed ProcInterface::stacks methods and refactor'd remain code 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 15 Dec 2009 12:23:33 +0200
+
+sp-rich-core (1.52.9) unstable; urgency=low
+
+  * Change Added Coments and executable name string from core file
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 15 Dec 2009 10:16:54 +0200
+sp-rich-core (1.52.8) unstable; urgency=low
+
+  * Available memory address might be received automatically from maps file (heap)
+
+ -- Denis Mingulov <denis.mingulov@symbio.com>  Tue, 15 Dec 2009 09:57:10 +0200
+
+sp-rich-core (1.52.7) unstable; urgency=low
+
+  * Change Parse the note section to extract the ESP
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Tue, 15 Dec 2009 00:31:07 +0200
+
+sp-rich-core (1.52.6) unstable; urgency=low
+
+  * Change Enabled compilation in native environment 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Mon, 14 Dec 2009 09:39:01 +0200
+
+sp-rich-core (1.52.5) unstable; urgency=low
+
+  * Change fixed compilation error 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Mon, 14 Dec 2009 09:08:03 +0200
+
+sp-rich-core (1.52.4) unstable; urgency=low
+
+  * Added Copyright information added 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Sun, 13 Dec 2009 23:14:54 +0200
+
+sp-rich-core (1.52.3) unstable; urgency=low
+
+  * Change Modified rich-core-extract so that it conforms to coding convention 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Sun, 13 Dec 2009 23:06:15 +0200
+
+sp-rich-core (1.52.2) unstable; urgency=low
+
+  * Added Doxygen documentation 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Sun, 13 Dec 2009 22:47:54 +0200
+
+sp-rich-core (1.52.1) unstable; urgency=low
+
+  * Changed install mode for the tests.xml file 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Fri, 11 Dec 2009 11:44:13 +0200
+
+sp-rich-core (1.52.0) unstable; urgency=low
+
+  * Change Included command-line parameters to core-reducer
+  * Added A single test case to -tests package to test command line parameters
+  * Change Changes the package build options to always include test suite
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Fri, 11 Dec 2009 10:50:40 +0200
+
+sp-rich-core (1.51.3) unstable; urgency=low
+
+  * Change modify -$(MAKE) distclean to keep bifh happy
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 10 Dec 2009 21:04:01 +0200
+
+sp-rich-core (1.51.2) unstable; urgency=low
+
+  * Change Modified the standards-version in debian/control as advised by bifh 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 10 Dec 2009 20:37:47 +0200
+
+sp-rich-core (1.51.1) unstable; urgency=low
+
+  * Changed internal package name to tests 
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 10 Dec 2009 20:13:46 +0200
+
+sp-rich-core (1.51.0) unstable; urgency=low
+
+  * Added Modified the package to contain the core-reducer functionality
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 10 Dec 2009 19:57:50 +0200
+
+sp-rich-core (1.50.1) unstable; urgency=low
+
+  * Fixed bug in four last digits of IMEI query 
+
+ -- Ville Ilvonen <ville.p.ilvonen@nokia.com>  Fri, 04 Sep 2009 14:13:41 +0300
+
+sp-rich-core (1.50.0) unstable; urgency=low
+
+  * Pumped version up to separate branch for m6
+  * Fixes misintegrated version that disable core-dumping
+  * Change device identifier from last to octets of MAC to last four of IMEI 
+
+ -- Ville Ilvonen <ville.p.ilvonen@nokia.com>  Fri, 04 Sep 2009 09:20:59 +0300
+
+sp-rich-core (1.28) unstable; urgency=low
+
+  * Added /media/mmc1/core-dumps folder creation to init start
+
+ -- Ville Ilvonen <kiryl.shutsemau@nokia.com>  Wed, 12 Jun 2009 09:42:34 +0300
+	
+sp-rich-core (1.26+0m6) unstable; urgency=low
+
+  * This entry has been added by BIFH queue processor
+    Suffix +0m6 added to package revision
+
+ -- Kiryl Shutsemau <kiryl.shutsemau@nokia.com>  Mon, 29 Jun 2009 14:41:22 +0300
+
+sp-rich-core (1.26) unstable; urgency=low
+
+  * Fixes NB#102200: get the signal without the kernel patch
+
+ --  Kiryl Shutsemau <kiryl.shutsemau@nokia.com>  Mon, 29 Jun 2009 14:38:12 +0200
+
+sp-rich-core (1.25) unstable; urgency=low
+
+  * Fixes NB#121539: support for --no-section-header need updating
+  * Fixes NB#121244: use obsolete /etc/osso_software_version file
+
+ --  Kiryl Shutsemau <kiryl.shutsemau@nokia.com>  Mon, 15 Jun 2009 16:36:30 +0200
+
+sp-rich-core (1.24) unstable; urgency=low
+
+  * Fixes: NB#118541 - Trivial optimization and issues
+
+ --  Kiryl Shutsemau <kiryl.shutsemau@nokia.com>  Mon, 15 Jun 2009 13:14:40 +0200
+
+sp-rich-core (1.23) unstable; urgency=low
+
+  * Fixes: NB#117425 - Including X server logs in Corematic dumps
+
+ --  Kiryl Shutsemau <kiryl.shutsemau@nokia.com>  Fri, 22 May 2009 16:42:10 +0200
+
+sp-rich-core (1.22) unstable; urgency=low
+
+  * Fixes: NB#115241 - rich-core should avoid oops log rcore creation on
+    first boot
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Fri,  8 May 2009 16:20:32 +0300
+
+sp-rich-core (1.21) unstable; urgency=low
+
+  * Fixes: NB#112765 - Improvement: identify individual device with
+    partial wlan mac in rich core file name
+  * Iinitial version of this was present in version 1.20, this version
+    expands the identifier to also apply to oopslogs
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed,  6 May 2009 13:57:19 +0300
+
+sp-rich-core (1.20) unstable; urgency=low
+
+  * Improvement: identify individual device with partial wlan mac
+    in rich core file name
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Mon,  4 May 2009 16:57:57 +0300
+
+sp-rich-core (1.1.9) unstable; urgency=low
+
+  * Automatic boot-time creation of kernel oopslog rich core 
+    now succeeds again. (Workaround for the NB#107537 until the parent
+    bug is fixed and allows a proper fix)
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed, 15 Apr 2009 09:50:13 +0300
+
+sp-rich-core (1.1.8) unstable; urgency=low
+
+  * Rich-core-dumper: Core_pid variable value is now set in a slightly
+    more optimized fashion.
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed, 18 Mar 2009 10:05:03 +0200
+
+sp-rich-core (1.1.7) unstable; urgency=low
+
+  * Fixes: NB#105421 - Extracting kernel oops logs at startup needs
+    device name change, again
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Thu, 12 Mar 2009 15:56:04 +0200
+
+sp-rich-core (1.1.6) unstable; urgency=low
+
+  * Removed some bashisms from the rich-core-dumper. Fixes: NB#103583
+  * Rich-core-dumper no longer relies on CORE_EXE and CORE_PID
+    environmental variables. Fixes: NB#102200
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Mon,  2 Mar 2009 16:15:18 +0200
+
+sp-rich-core (1.1.5) unstable; urgency=low
+
+  * Simplified coredumping location decision logic.
+  * Support also MyDocs as a possible location for coredumps.
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Thu,  5 Feb 2009 10:27:20 +0200
+
+sp-rich-core (1.1.4) unstable; urgency=low
+
+  * Fixed incorrect permissions for the package Upstart script.
+  * Fixes: NB#90573
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed, 29 Oct 2008 12:30:57 +0200
+
+sp-rich-core (1.1.3) unstable; urgency=low
+
+  * Fixed dependencies and reverted the coredir mountpoint change.
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Tue, 28 Oct 2008 16:42:59 +0200
+
+sp-rich-core (1.1.2) unstable; urgency=low
+
+  * Sp-rich-core now uses upstart for its startup/shutdown control.
+  * When stopping rich-core dumping, set up core pattern to point into
+    /media/mmc2 rather than /media/mmc1 by default.
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Mon, 27 Oct 2008 16:16:11 +0200
+
+sp-rich-core (1.1.1) unstable; urgency=low
+
+  * Fixed dependency issue for sp-rich-core-postproc indicated by
+    Lintian
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed, 15 Oct 2008 10:52:39 +0300
+
+sp-rich-core (1.1.0) unstable; urgency=low
+
+  * Updated sp-rich-core to work properly on Fremantle with the updated
+    Crash Reporter for maemo.
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed, 15 Oct 2008 10:16:56 +0300
+
+sp-rich-core (1.0.12-1) unstable; urgency=low
+
+  * Make MTD partition number parsing more robust. Fixes: NB#88053
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Thu, 21 Aug 2008 17:18:23 +0300
+
+sp-rich-core (1.0.11-1) unstable; urgency=low
+
+  * Applied a patch that makes rich-core-extract capable of handling
+    wimax dumps as well as core dumps.
+  * Rich-core-dumper privacy settings support was upgraded match changes
+    done in Crash Reporter.
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed, 11 Jun 2008 12:20:12 +0300
+
+sp-rich-core (1.0.10-1) unstable; urgency=low
+
+  * Oopslog partition is now determined dynamically instead of using a
+    hardcoded value.
+  * Oopslog checks during boot should now be faster and waste less
+    storage space.
+  * Core dump filtering implementation was tweaked to provide a
+    possibility of using both whitelisting and blacklisting at the same
+    time.
+  * Rich-core-dumper has a new option (-no-section-header) to allow
+    creation of customized dumps. Fixes: NB#85845
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Tue, 27 May 2008 17:17:44 +0300
+
+sp-rich-core (1.0.9-1) unstable; urgency=low
+
+  * Now when rich-core is started, a check is performed for existence of
+    kernel OOPS dumps, and rich-core - like oopslog is created.
+  * Moved rich-core init a bit further in boot sequence to increase the
+    probability of memory cards being already available.
+  * Fixes: NB#80365
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed,  2 Apr 2008 16:09:30 +0300
+
+sp-rich-core (1.0.8-1) unstable; urgency=low
+
+  * Rich-core-dumper now uses .rcore.lzo suffix. Fixes: NB#81264
+  * Rich-core-extract now accepts both .rcore and .rcore.lzo suffixes.
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed, 27 Feb 2008 16:41:24 +0200
+
+sp-rich-core (1.0.7-1) unstable; urgency=low
+
+  * Format of the package list has been modified slightly. Debug
+    packages are also now omitted from it. Fixes: NB#80313
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed,  6 Feb 2008 16:54:02 +0200
+
+sp-rich-core (1.0.6-1) unstable; urgency=low
+
+  * Syslog had moved, try the new location if no log is found from the
+    old location.
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Tue,  5 Feb 2008 16:08:51 +0200
+
+sp-rich-core (1.0.5-1) unstable; urgency=low
+
+  * Sort the list of installed packages.
+  * The inclusion of package list in the rich cores is now configurable.
+    Fixes: NB#79638
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed, 23 Jan 2008 16:29:57 +0200
+
+sp-rich-core (1.0.4-1) unstable; urgency=low
+
+  * Add list of installed packages to the rich-core-dumper output.
+    Fixes: NB#79099
+  * Some documentation improvements
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Thu, 10 Jan 2008 10:12:37 +0200
+
+sp-rich-core (1.0.3-1) unstable; urgency=low
+
+  * Privacy configuration options have been added to limit the amount of
+    potentially sensitive information stored in rich cores.
+  * Fixes: NB#77039
+  * More documentation cleanup work.
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Thu, 20 Dec 2007 13:48:13 +0200
+
+sp-rich-core (1.0.2-1) unstable; urgency=low
+
+  * Manual page introduced in version 1.0.1-1 contained a very
+    misleading typo, corrected it. Fixes: NB#75303
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Tue, 20 Nov 2007 12:27:30 +0200
+
+sp-rich-core (1.0.1-1) unstable; urgency=low
+
+  * Ensure that original core pattern is restored when the package is
+    removed/purged. Fixes: NB#75636
+  * Added rich-core-dumper manual page. Fixes: NB#75303
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Thu, 15 Nov 2007 10:25:54 +0200
+
+sp-rich-core (1.0-13) unstable; urgency=low
+
+  * Downgraded osso-product-info dependency to recommendation, as limited
+    but usable rich-cores are produced even when o-p-i is not installed
+  * Fixes: NB#74236
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Thu,  1 Nov 2007 15:33:03 +0200
+
+sp-rich-core (1.0-12) unstable; urgency=low
+
+  * Use (and depend on) osso-product-info for more accurate system
+    information
+  * Fixes: NB#65769
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Thu, 23 Aug 2007 16:59:11 +0300
+
+sp-rich-core (1.0-11) unstable; urgency=low
+
+  * The rich-core-extract manual page was updated (less failure-prone
+    example when not run on a desktop computer, other minor tweaks)
+  * Fixes: NB#60890
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Thu, 12 Jul 2007 13:45:16 +0300
+
+sp-rich-core (1.0-10) unstable; urgency=low
+
+  * Some additional tiny licencing/copyright information tweaks
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Fri, 11 May 2007 10:47:41 +0300
+
+sp-rich-core (1.0-9) unstable; urgency=low
+
+  * Fixed copyright/licencing issues. Fixes: NB#55850
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Fri, 11 May 2007 09:08:52 +0300
+
+sp-rich-core (1.0-8) unstable; urgency=low
+
+  * Fixed the postinstallation script
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Wed, 25 Apr 2007 10:28:42 +0300
+
+sp-rich-core (1.0-7) unstable; urgency=low
+
+  * Manual page for rich-core-extract was added
+  * In some cases the process name was left out of the rich core file,
+    fixed to be more robust
+  * Store some additional information to rich cores
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Fri, 20 Apr 2007 16:49:53 +0300
+
+sp-rich-core (1.0-6) unstable; urgency=low
+
+  * Rich-core-extract Perl script was replaced with a binary to allow
+    Perl dependency to be dropped
+  * Fixed outdated FSF address in copyright file
+  * Fixed Documentation (including copyright) not getting installed
+  * Fixes: NB#54451
+
+ --  Eero Tamminen <eero.tamminen@nokia.com>  Tue, 17 Apr 2007 17:21:44 +0300
+
+sp-rich-core (1.0-5) unstable; urgency=low
+
+  * remove sp-rich-core.conffiles 
+
+ -- Eero Tamminen <eero.tamminen@nokia.com>  Thu,  5 Apr 2007 12:33:20 +0300
+
+sp-rich-core (1.0-4) unstable; urgency=low
+
+  * absolute path in debian/sp-rich-core.conffiles 
+
+ -- Eero Tamminen <eero.tamminen@nokia.com>  Thu,  5 Apr 2007 11:20:58 +0300
+
+sp-rich-core (1.0-3) unstable; urgency=low
+
+  * make init.d script support arguments 
+
+ -- Eero Tamminen <eero.tamminen@nokia.com>  Thu,  5 Apr 2007 10:42:30 +0300
+
+sp-rich-core (1.0-2) unstable; urgency=low
+
+  * cores were dumped to / when no location was found - fixed 
+
+ -- Eero Tamminen <eero.tamminen@nokia.com>  Tue, 27 Feb 2007 15:19:04 +0200
+
+sp-rich-core (1.0-1) unstable; urgency=low
+
+  * Added dependency to sp-endurance 
+
+ -- Eero Tamminen <eero.tamminen@nokia.com>  Wed, 21 Feb 2007 13:11:37 +0200
+
+sp-rich-core (1.0) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Eero Tamminen <eero.tamminen@nokia.com>  Tue, 20 Feb 2007 15:20:44 +0200
+
+Local variables:
+mode: debian-changelog
+End:

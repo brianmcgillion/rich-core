@@ -1,0 +1,28 @@
+
+Upstream Author(s):
+
+    Eero Tamminen <eero.tamminen@nokia.com>,
+    Ville Ilvonen <ville.p.ilvonen@nokia.com>,
+    Brian McGillion <brian.mcgillion@symbio.com>, 
+    Denis Mingulov <denis.mingulov@symbio.com>,
+    Riku Halonen <riku.halonen@nokia.com>,
+    Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>,
+    Sampo Saaristo <ext-sampo.2.saaristo@nokia.com>
+
+Copyright:
+
+    Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+
+Licence:
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  version 2 as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  On Debian GNU/Linux systems you can find a copy of the GPL in
+  /usr/share/common-licenses/GPL-2.

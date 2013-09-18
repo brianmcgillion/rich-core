@@ -1,0 +1,181 @@
+#!/bin/sh
+# Test rich-core-dumper whitelist/blacklist feature
+#
+# Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+#
+# This file is part of sp-rich-core
+#
+# Author: Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# version 2 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+#
+#
+
+COMMANDS_FILE=/tmp/rich-core-dumper-test.tmp
+WHITELIST_FILE=/etc/rich-core.include
+WHITELIST_FILE_BAK=/etc/rich-core.include.bak
+BLACKLIST_FILE=/etc/rich-core.exclude
+BLACKLIST_FILE_BAK=/etc/rich-core.exclude.bak
+CORE_DUMPS_DIR=/home/user/MyDocs/core-dumps/
+
+# 0 stand for rich core is not created, 1 for it is created
+EXPECTED_CORE=0
+
+_setup_case1() {
+    EXPECTED_CORE=1
+    cat > $COMMANDS_FILE <<EOF
+/bin/sleep 60
+EOF
+    cat > $WHITELIST_FILE <<EOF
+sleep
+dummy
+EOF
+    rm -f $BLACKLIST_FILE
+}
+
+_setup_case2() {
+    EXPECTED_CORE=0
+    cat > $COMMANDS_FILE <<EOF
+/bin/sleep 60
+EOF
+    rm -f $WHITELIST_FILE
+    cat > $BLACKLIST_FILE <<EOF
+foobar  
+sleep  
+EOF
+}
+
+_setup_case3() {
+    EXPECTED_CORE=1
+    cat > $COMMANDS_FILE <<EOF
+/bin/sleep 60
+EOF
+    cat > $WHITELIST_FILE <<EOF
+  dummy 
+  sleep 
+EOF
+    cat > $BLACKLIST_FILE <<EOF
+sleeper
+foobar
+EOF
+}
+
+_setup_case4() {
+    EXPECTED_CORE=1
+    cat > $COMMANDS_FILE <<EOF
+/bin/sleep 60
+EOF
+    rm -f $WHITELIST_FILE
+    cat > $BLACKLIST_FILE <<EOF
+sleeper
+foobar
+EOF
+}
+
+_run_test_case() {
+    cat $COMMANDS_FILE | while read cmd
+    do
+	EXE=$(basename ${cmd%% *})
+	$cmd&
+	PID=$!
+
+	sleep 1
+        # send signal causing core dump and wait rich core to be created
+	kill -11 $PID
+	sleep 5
+	
+	if ls $CORE_DUMPS_DIR | grep -qe "$EXE-.*-$PID\.rcore\.lzo"; then
+	    if [ "$EXPECTED_CORE" -eq 1 ]; then
+		echo "PASSED: command $cmd"
+	    else
+		echo "FAILED: command $cmd" >&2
+		touch /tmp/richcoretest_failed
+	    fi
+	else
+	    if [ "$EXPECTED_CORE" -eq 0 ]; then
+		echo "PASSED: command $cmd"
+	    else
+		echo "FAILED: command $cmd" >&2
+		touch /tmp/richcoretest_failed
+	    fi
+	fi
+
+        # cleanup (possible) core
+	rm -f $CORE_DUMPS_DIR/$EXE*$PID.rcore.lzo
+    done
+}
+
+#
+# MAIN program
+#
+
+ret=0
+rm -f /tmp/richcoretest_failed
+
+# check core dir exists
+if [ ! -d "$CORE_DUMPS_DIR" ]; then
+    echo "Core dump directory $CORE_DUMPS_DIR does not exists"
+    exit 2
+fi
+
+# backup original whitelist file
+if [ -e "$WHITELIST_FILE" ]; then
+    mv $WHITELIST_FILE $WHITELIST_FILE_BAK
+fi
+
+# backup original blacklist file
+if [ -e "$BLACKLIST_FILE" ]; then
+    mv $BLACKLIST_FILE $BLACKLIST_FILE_BAK
+fi
+
+echo "Running case 1"
+_setup_case1
+_run_test_case
+
+echo "Running case 2"
+_setup_case2
+_run_test_case
+
+echo "Running case 3"
+_setup_case3
+_run_test_case
+
+echo "Running case 4"
+_setup_case4
+_run_test_case
+
+# restore original whitelist
+if [ -e "$WHITELIST_FILE_BAK" ]; then
+    mv $WHITELIST_FILE_BAK $WHITELIST_FILE
+else
+    rm -f $WHITELIST_FILE
+fi
+
+# restore original blacklist
+if [ -e "$BLACKLIST_FILE_BAK" ]; then
+    mv $BLACKLIST_FILE_BAK $BLACKLIST_FILE
+else
+    rm -f $BLACKLIST_FILE
+fi
+
+if [ -e /tmp/richcoretest_failed ]; then
+    ret=1
+fi
+
+rm -f $COMMANDS_FILE
+rm -f /tmp/richcoretest_failed
+
+echo "$0 exiting with return value $ret"
+exit $ret

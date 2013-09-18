@@ -1,0 +1,163 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          rich-core
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start the rich-core logging facility.
+# Description:       Catch core dumps as they occur and process them so that a
+#        complete crash report can be sent to the crash report server.  This 
+#        script initalizes the system for collecting the reports.
+### END INIT INFO
+
+# Set up rich core at bootup
+
+# This file is part of sp-rich-core
+#
+# Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+#
+# Contact: Eero Tamminen <eero.tamminen@nokia.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# version 2 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+_SLEPT_ALREADY=0
+
+_create_oopslog_dump()
+{
+	retval=0
+	
+	# commented out use of additional partition, as we probably
+	# have enough space on /tmp and likely increasing the size of
+	# current /tmp instead would be better to do. 
+
+	# tmp_oopslog_location=/var/tmp/oopslogpt/oopslog
+	tmp_oopslog_location=/tmp/oopslog
+	
+	# Return if we don't have the sp-oops-extract
+
+	test -x /usr/bin/sp-oops-extract || return 1
+	
+		# We also need a partition; check its number and whether it exists
+
+#	partnum=$(sed 's/^.*console=ttyMTD\([0-9]\+\).*$/\1/' < /proc/cmdline)
+	partnum="3"
+
+	echo "Oopslog partition should be: /dev/mtd$partnum"
+
+	test -n "$partnum" && test -e "/dev/mtd$partnum" || return 1
+
+	# We used to create an additional tmpfs partition here, but
+	# this was removed, because the copy of oopslog really should fit
+	# nicely in /tmp during boot
+	# (and some additional optimizations were made)
+
+	echo "Checking whether we have new kernel OOPSes"
+
+	sp-oops-extract "/dev/mtd$partnum" > $tmp_oopslog_location
+	
+	tail -5 $tmp_oopslog_location > /tmp/oopslogtail
+
+	# For speed and storage reasons we store only the last 5 lines of
+	# oopslog to permanent storage and use that as a comparison basis
+	# to determine when we have new oops(es) to dump. Whole log is
+	# still dumped for now (pros: if we get more than one oops,
+	# it's handled automatically. cons: usually duplicate oops
+	# information will be sent and needs to be handled)
+
+	if [ -e /var/log/oopslogtail ]; then
+		cmp -s /tmp/oopslogtail /var/log/oopslogtail
+		if [ $? != 0 ]; then
+			
+			# this is needed to get file systems mounted before we dump there
+			sleep 90
+        	_SLEPT_ALREADY=1
+        	
+			echo "Oops differs from the old oops"
+			echo "Creating a dump from the oopslog"
+			export IS_OOPSLOG=y
+			
+			cat $tmp_oopslog_location | rich-core-dumper
+			if [ $? -ne 0 ]; then
+				retval=$?
+				echo "Dumping failed.";
+			else
+				cp /tmp/oopslogtail /var/log/oopslogtail
+				echo "Replaced oopslog identifier."
+			fi
+		fi
+	else
+#
+# Avoid duplicates in case mtdoops partition is not cleared during reflash:
+# We use /var/log/oopslogtail as "first boot" flag.
+# In first boot, do not create rcore entry, only set the oopslogtail mark.
+# New oops entries only coming after that point will trigger creation.
+#
+	        cp /tmp/oopslogtail /var/log/oopslogtail
+	fi
+
+	rm $tmp_oopslog_location
+	rm /tmp/oopslogtail
+	return $retval
+}
+
+_create_bootreason_dump()
+{
+	bootreason=$(sysinfoclient -p /component/boot-reason)
+	if [ x"${bootreason}" = x"32wd_to" ] || [ x"${bootreason}" = x"hw_bug" ]; then
+	
+		if [ $_SLEPT_ALREADY -ne 1 ]; then
+			# this is needed to get file systems mounted before we dump there
+			sleep 90
+			_SLEPT_ALREADY=1
+		fi	
+	    echo "Creating a dump about exceptional bootreason"
+		echo -e "\n[---rich-core: reboot-$bootreason---]" > /tmp/tmp-bootreason
+		echo "lifeguard_resets:" >> /tmp/tmp-bootreason
+		cat /var/lib/dsme/stats/lifeguard_resets >> /tmp/tmp-bootreason
+		echo "lifeguard_restarts:" >> /tmp/tmp-bootreason
+		cat /var/lib/dsme/stats/lifeguard_restarts >> /tmp/tmp-bootreason
+		cat /tmp/tmp-bootreason | rich-core-dumper --no-section-header --default-name reboot-$bootreason
+		rm /tmp/tmp-bootreason
+	fi
+	
+	return $?
+}
+
+case "$1" in
+  start|restart|force-reload)
+
+	# Do not execute the script if we don't have the core dumper installed
+	# (i.e. the package has been removed but not purged)
+
+	test -x /usr/sbin/rich-core-dumper || exit 0
+
+	# Create folder to enable cores - by default /home/user/MyDocs/core-dumps
+	test -x /home/user/MyDocs/core-dumps || mkdir /home/user/MyDocs/core-dumps
+
+  	echo "Setting up rich core"
+	_create_oopslog_dump
+	_create_bootreason_dump
+	;;
+  stop)
+	# Not implemented
+	;;
+  *)
+  	N=/etc/init.d/rich-core
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

@@ -1,0 +1,36 @@
+Source: sp-rich-core
+Section: devel
+Priority: optional
+Maintainer: Brian McGillion <brian.mcgillion@symbio.com>
+Build-Depends: debhelper (>= 4.0.0), libelfg0-dev (>= 0.8.10), autoconf, automake, aegis-builder (>= 1.6)
+Standards-Version: 3.8.0
+
+Package: sp-rich-core
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, lzop, sp-endurance, core-reducer, sysinfoclient, sysinfod, sp-oops-extract
+Description: Rich core
+ Create rich core dumps. Rich cores include information about system
+ state and core in a single compressed file. Requires a kernel that
+ supports piping core dumps.
+
+Package: sp-rich-core-postproc
+Architecture: any
+Depends: ${shlibs:Depends}, lzop
+Description: Rich core postprocessing
+ Tools to extract information from rich cores.
+
+Package: core-reducer
+Architecture: any
+Section: devel
+Depends: ${shlibs:Depends}, ${misc:Depends}, libelfg0
+Description: Reduce the size of a core dump
+ Create core dumps that have a reduced size, allowing them to be 
+ transported between systems, even those with limited network throughput.
+
+Package: sp-rich-core-tests
+Architecture: any
+Depends: ci-testing, core-reducer (= ${binary:Version}), sp-rich-core (= ${binary:Version}), sp-rich-core-postproc (= ${binary:Version})
+XB-Maemo-CI-Packages: sp-rich-core, sp-rich-core-postproc, sp-rich-core-tests
+XB-Maemo-CI-Stage: fast, staging, acceptance, validation
+Description: Tests for the sp-rich-core packages
+ Provides test cases for sp-rich-core, sp-rich-core-postproc and core-reducer

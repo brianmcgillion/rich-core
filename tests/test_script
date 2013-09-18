@@ -1,0 +1,228 @@
+#!/bin/sh
+# Test real core dump reducing
+#
+# Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+#
+# This file is part of sp-rich-core
+#
+# Authors: Brian McGillion <brian.mcgillion@symbio.com>, Denis Mingulov <denis.mingulov@symbio.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# version 2 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+#
+#
+
+#
+# Helper functions
+#
+
+_obtain_configuration()
+{
+  # default values
+
+  SCRIPT_ADDITIONAL_KEY="core-reducer-testing"
+}
+
+_parse_arguments()
+{
+  while [ $# -ge 1 ]; do
+    case $1 in 
+      "--do-wait")
+      DO_WAIT=true
+    esac
+    shift
+  done
+}
+
+_wait()
+{
+  # sleep for 1 minute
+  # done in such way to have a 'real' backtrace
+  for i in 1 2 3 4 5 6 7 8 9 10
+  do
+    sleep 6
+  done
+}
+
+_disable_rich_core_dumper()
+{
+  # disable rich core dumper
+  if [ -e /etc/init.d/rich-core-pattern ]; then
+    /etc/init.d/rich-core-pattern stop
+  fi
+  if [ -e /etc/init.d/rich-core-dumps ]; then
+    /etc/init.d/rich-core-dumps stop
+  fi  
+}
+
+_enable_rich_core_dumper()
+{
+  # enable
+  if [ -e /etc/init.d/rich-core-pattern ]; then
+    /etc/init.d/rich-core-pattern start
+  fi
+  if [ -e /etc/init.d/rich-core-dumps ]; then
+    /etc/init.d/rich-core-dumps start
+  fi
+}
+
+_get_shadow_pid()
+{
+  # get pid of 2nd instance
+  ps ax | 
+    grep "$SCRIPT" | 
+    grep "$SCRIPT_ADDITIONAL_KEY" |
+    tr '\n' ' ' |
+    sed -e 's/^ *\([0-9]*\) .*$/\1/g'
+}
+
+_get_core_name()
+{
+  # get core file name
+  # bash / procid / SIGSEGV
+  cat /proc/sys/kernel/core_pattern |
+    tr '\n' ' ' |
+    sed -e 's/%e/test_script/g' |
+    sed -e "s/%p/$pid/g" |
+    sed -e 's/%s/11/g' |
+    sed -e 's/^ *//' -e 's/ *$//'
+}
+
+
+#
+# Main program
+#
+
+_obtain_configuration
+
+_parse_arguments $*
+
+# if the applicatiom is started for a wait
+# (to allow "fork" for shell
+if [ "$DO_WAIT" = "true" ]; then
+  _wait
+  exit
+fi
+
+# return value, 0 by default
+ret=0
+
+# otherwise - run real tests
+
+# disable rich core dumper
+_disable_rich_core_dumper
+
+# Get absolute path to this script
+SCRIPT=`readlink -f $0`
+# Get absolute path to this script
+SCRIPTDIR=`dirname $SCRIPT`
+echo $SCRIPTDIR
+
+# start second instance (to crash it)
+$SCRIPT --do-wait --$SCRIPT_ADDITIONAL_KEY &
+
+pid=`_get_shadow_pid`
+pid="$!"
+#echo $!
+echo "Found pid: $pid"
+
+
+# create a core dump
+
+# debug output - show any started processes prepared for core dumping
+ps ax | grep $SCRIPT | grep $SCRIPT_ADDITIONAL_KEY
+echo "kill -SIGSEGV $pid"
+
+# kill a process - a core dump must be created
+kill -SIGSEGV $pid
+
+# try to be sure that it will be 'killed'
+wait $pid
+
+# wait some time to create a core dump etc
+# we have to wait because a killed application will be 'stopped' immediately
+# and just after that core dump will be created (and it will take some time)
+sleep 4
+
+# get its name
+corename=`_get_core_name`
+
+echo "Corename has to be: $corename" 
+
+# when core dumping is started, empty file is already exist, and just some time after
+# it will be closed and a real content might be visible, so existing core dump with size 0 
+# just means that 
+# 1) core dumping is yet processing 
+# or
+# 2) something going wrong
+
+# so do additional check - to prevent time out, just once
+if [ -e $corename ]; then
+
+  # get core size
+  length=`stat $corename | awk '/Size:/{print $2}'`
+
+  # if it is 0,
+  if [ "$length" -le 0 ]; then
+    sleep 5
+  fi
+fi
+
+
+# do tests if core is existing only
+# (it might be that core is not created)
+if [ -e $corename ]; then
+  echo "Core dump exists"
+  corename_reduced="$corename.reduced"
+
+  echo "Step 1"
+  cor_red="core-reducer -i $corename -o $corename_reduced -e /bin/sh"
+  echo $cor_red
+  $cor_red
+  echo "Step 2"
+
+  length=`stat $corename | awk '/Size:/{print $2}'`
+  echo "Step 3"
+  length_r=`stat $corename_reduced | awk '/Size:/{print $2}'`
+  echo "Step 4"
+
+  echo "Original: $length, reduced: $length_r"
+
+  rm $corename
+  rm $corename_reduced
+
+  if [ "$length_r" -le 0 ]; then
+    echo "Reduced core dump incorrect size: $length_r"
+    ret=2
+  fi
+
+  if [ "$length_r" -gt "$length"  ]; then
+    echo "Reduced core dump is larger than original"
+    ret=1
+  fi
+
+else 
+  echo "Core dump does not exist"
+
+  # change return value
+  ret=3
+fi
+
+#kill -9 $pid
+
+# enable back if it was disabled
+_enable_rich_core_dumper
+
+exit $ret
+

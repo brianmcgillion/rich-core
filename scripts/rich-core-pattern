@@ -1,0 +1,75 @@
+#!/bin/sh
+# Set up rich core at bootup
+
+# This file is part of sp-rich-core
+#
+# Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+#
+# Contact: Eero Tamminen <eero.tamminen@nokia.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# version 2 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+
+SW_VERSION_FILE=/tmp/osso_software_version
+PRODUCT_INFO_FILE=/tmp/osso-product-info
+
+case "$1" in
+  start|restart|force-reload)
+
+	# Do not execute the script if we don't have the core dumper installed
+	# (i.e. the package has been removed but not purged)
+
+	test -x /usr/sbin/rich-core-dumper || exit 0
+
+	! test -x /home/user/MyDocs || test -x /home/user/MyDocs/core-dumps || mkdir /home/user/MyDocs/core-dumps
+
+	# setup new core_pattern
+	sysctl -w kernel.core_pattern='|/usr/sbin/rich-core-dumper --pid=%p --signal=%s --name=%e'
+	
+	# It is not guaranteed that sysinfod service is up in this early phase.
+	# Therefore sysinfo-tool cannot be used to fetch system information.
+	# Just create empty system information files
+
+	cp -f /dev/null ${PRODUCT_INFO_FILE}
+	cp -f /dev/null ${SW_VERSION_FILE}
+	;;
+
+  stop)
+  	# restore the backup-ed core_pattern only if it contains "rich-core-dumper" 
+  	# keyword as it might have already been changed by someone else
+	coredir=/home/user/MyDocs/core-dumps
+	test -x $coredir || mkdir -p $coredir
+
+	release=$(cat ${SW_VERSION_FILE})
+	release=${release#*.}   # remove prefix until first dot
+	release=${release%_MR0} # remove _MR0 postfix
+	echo "Enabling core dumps to $coredir/..."
+
+	grep -q "rich-core-dumper" /proc/sys/kernel/core_pattern
+  	if [ $? -eq 0 ]; then
+		sysctl -w kernel.core_pattern=$coredir/%e-%s-%p-$release.core
+	fi
+  		
+	test -e ${PRODUCT_INFO_FILE} && rm ${PRODUCT_INFO_FILE}
+	test -e ${SW_VERSION_FILE} && rm ${SW_VERSION_FILE}
+	;;
+  
+  *)
+  	N=/etc/init.d/rich-core
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

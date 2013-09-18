@@ -1,0 +1,531 @@
+#!/bin/sh
+# Gathers information about system state and creates an lzop
+# compressed rich core
+
+# This file is part of sp-rich-core
+#
+# Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+#
+# Contact: Eero Tamminen <eero.tamminen@nokia.com>
+# Authors: Riku Halonen <riku.halonen@nokia.com>, Sami Lahtinen <ext-sami.t.lahtinen@nokia.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# version 2 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+
+#
+# Constant variables
+#
+
+SW_VERSION_FILE=/tmp/osso_software_version
+PRODUCT_INFO_FILE=/tmp/osso-product-info
+CORE_SIZE_LIMIT=500000		# kB
+
+#
+# Helper functions
+#
+
+_obtain_configuration()
+{
+  # default fallback values, overruled by configuration file if one exists
+
+  system_settings=/usr/share/crash-reporter-settings
+  user_settings=/home/user/.config/crash-reporter-settings
+
+  INCLUDE_CORE=true
+  REDUCE_CORE=true
+  INCLUDE_SYSLOG=true
+  INCLUDE_PKGLIST=true
+
+  DEFAULT_CORE_NAME="unknown"
+
+  if [ -e $system_settings/crash-reporter-privacy.conf ]; then
+    . $system_settings/crash-reporter-privacy.conf 2>/dev/null
+  fi
+  if [ -e $user_settings/crash-reporter-privacy.conf ]; then
+    . $user_settings/crash-reporter-privacy.conf 2>/dev/null
+  fi
+}
+
+_parse_arguments()
+{
+  while [ $# -ge 1 ]; do
+    case $1 in 
+      "--no-section-header")
+      NO_SECTION_HEADER=true
+      ;;
+      "--default-name")
+			shift
+      DEFAULT_CORE_NAME="$1"
+      ;;
+      --pid=*)
+      core_pid=${1#--pid=}     
+      ;;
+      --signal=*)
+      core_sig=${1#--signal=}
+      ;;
+      --name=*)
+      core_name=${1#--name=}
+      ;;
+    esac
+    shift
+  done
+}
+
+_print_header()
+{
+    printf '\n[---rich-core: %s---]\n' "$@"
+}
+
+_print_separator()
+{
+    printf '\n--- %s ---\n' "$@"
+}
+
+_print_file_with_header()
+{
+  if [ -f $1 ]; then
+    _print_header $1
+    cat $1
+  fi
+}
+
+_print_syslog_files_with_header()
+{
+    _print_header $1
+    for xorglog in /var/log/Xorg.0.log.*.gz; do
+        if [ -f "$xorglog" ]; then
+            _print_separator $xorglog
+            zcat $xorglog
+        fi
+    done
+    if [ -f /tmp/Xorg.0.log.old ]; then
+	_print_separator /tmp/Xorg.0.log.old
+	cat /tmp/Xorg.0.log.old
+    fi
+    if [ -f /tmp/Xorg.0.log ]; then
+	_print_separator /tmp/Xorg.0.log
+	cat /tmp/Xorg.0.log
+    fi
+    if [ -x /bin/dmesg ]; then
+	_print_separator dmesg
+	/bin/dmesg
+    fi
+    for file in "$@"; do
+	if [ -f $file ]; then
+	    _print_separator $file
+	    cat $file
+	fi
+    done
+}
+
+_print_command_with_header()
+{
+  _cmd=$1
+  shift
+  if [ -x ${_cmd} ]; then
+    _print_header ${_cmd##*/}
+    { ${_cmd} $@ 2>&1; }
+  fi
+}
+
+_free_space()
+{
+  # get df for the directory, skip the first line (column headers),
+  # and then print the third last column "Available"
+  df -Pk $1 | awk -F ' ' 'NR == 1 {next}; /[0-9]{1,3}%/ { print $(NF-2) }'
+}
+
+_check_sw_version_file()
+{
+  # check if the file does not exist or is empty
+  if [ ! -s ${SW_VERSION_FILE} ]; then
+    VERSION=$(sysinfoclient -p /device/sw-release-ver 2>/dev/null)
+    if [ -z $VERSION ]; then
+	/usr/sbin/sysinfod --static
+	VERSION=$(sysinfoclient -p /device/sw-release-ver 2>/dev/null)
+    fi
+    echo "$VERSION" > ${SW_VERSION_FILE}
+  fi
+  return 0
+}
+
+_check_product_info_file()
+{
+  # check if the file does not exist or is empty
+  if [ ! -s ${PRODUCT_INFO_FILE} ]; then
+    VERSION=$(sysinfoclient -p /device/sw-release-ver 2>/dev/null)
+    if [ -z $VERSION ]; then
+	/usr/sbin/sysinfod --static
+	VERSION=$(sysinfoclient -p /device/sw-release-ver 2>/dev/null)
+    fi
+    echo "OSSO_VERSION='$VERSION'" > ${PRODUCT_INFO_FILE}
+  fi
+  return 0
+}
+
+_MyDocs_mounted_to_vfat()
+{
+    mount | grep MyDocs | grep -q vfat
+    return $?
+}
+
+#
+# Information collection functions
+#
+
+_section_date()
+{
+  _print_command_with_header /bin/date
+}
+
+_section_proc_fd()
+{
+  _print_header fd
+  ls -l /proc/${core_pid}/fd/
+}
+
+_section_proc_smaps()
+{
+  _print_file_with_header /proc/${core_pid}/smaps
+}
+
+_section_software_version()
+{
+  if _check_sw_version_file; then
+    _print_file_with_header ${SW_VERSION_FILE}
+  fi
+}
+
+_section_component_version()
+{
+  _print_header /proc/component_version
+  if [ ! -e /var/cache/sysinfod/values ]; then
+      /usr/sbin/sysinfod --static >/dev/null 2>&1
+  fi
+  sysinfoclient -g /component/product -g /component/hw-build -g /component/nolo -g /component/boot-mode 2>/dev/null | awk -F ' ' '{gsub(/\/.*\//,"",$1); printf("%-11s %s\n",$1,$3)}'
+}
+
+_section_ifconfig()
+{
+  _print_command_with_header /sbin/ifconfig -a
+}
+
+_section_df()
+{
+  _print_command_with_header /bin/df
+}
+
+_section_ls_proc()
+{
+  _print_header ls_proc
+  ls -l /proc/${core_pid}/
+}
+
+_section_cmdline()
+{
+  if [ -f /proc/${core_pid}/cmdline ]; then
+    _print_header /proc/${core_pid}/cmdline
+    # replace null chars in cmdline with space
+    tr '\0' ' ' < /proc/${core_pid}/cmdline
+  fi
+}
+
+_section_slabinfo()
+{
+  _print_file_with_header /proc/slabinfo
+}
+
+_section_xmeminfo()
+{
+  _print_command_with_header /usr/bin/xmeminfo -d :0
+}
+
+_section_proc2csv()
+{
+  _print_command_with_header /usr/bin/proc2csv
+}
+
+_section_packagelist()
+{
+  _print_header packagelist
+  awk '/^Package:/{printf("%s ",$2)}/^Version:/{print $2}' /var/lib/dpkg/status | /bin/grep -v -e -l10n -e -dbg | sort
+}
+
+_section_syslog()
+{
+# as syslog has existed in two different places, try the old one first
+# to support older releases
+
+  if [ -e /var/ftd-log/syslog ]; then
+    _print_syslog_files_with_header /var/ftd-log/syslog
+  else
+    _print_syslog_files_with_header /var/log/syslog /var/log/syslog.old
+  fi
+}
+
+_section_product_info()
+{
+  if _check_product_info_file; then
+    _print_file_with_header ${PRODUCT_INFO_FILE}
+  fi
+}
+
+_section_rich_core_errors()
+{
+  if [ "${omit_core}" = "true" ]; then
+    _print_header rich-core-errors
+    echo "Core dumping was omitted due to lack of free space on device or core size greater than ${CORE_SIZE_LIMIT} kB."
+    echo "Free space on device = ${freespace} kB"
+    echo "Approximate size of core = ${coresize_approx} kB"
+    echo "VmSize = ${vmsize} kB"
+    echo "VmExe  = ${vmexe} kB"
+    echo "VmLib  = ${vmlib} kB"
+  fi
+}
+
+_section_extra_files()
+{
+  if [ -d /etc/rich-core/ ]; then
+    extras=$(find /etc/rich-core/ -type f \( -name default.extras -o -name ${core_name}.extras \) | xargs cat)
+    for file in $(for i in ${extras}; do echo $i; done | sort -u)
+    do
+      _print_file_with_header ${file}
+    done
+  fi
+}
+
+_get_vmsizes()
+{
+  # get virtual memory size information of process
+  set $(awk -F' ' '/VmSize|VmExe|VmLib/ { print $2 }' /proc/$1/status);
+  vmsize=$1
+  vmexe=$2
+  vmlib=$3
+}
+
+#
+# Main program
+#
+
+_obtain_configuration
+
+_parse_arguments $*
+
+# if dumping disabled in settings, don't bother going further
+if [ x"${coredumping}" = x"false" ]; then
+  cat > /dev/null
+  exit
+fi
+
+# Check, if there's location with enough space to write a rich-core.
+if [ -d /home/user/MyDocs/core-dumps ]; then
+    freespace=`_free_space /home/user/MyDocs/core-dumps`
+    if [ -n "$freespace" -a "$freespace" -gt 20000 ]; then
+        # more than 20MB free, go ahead
+        core_location="/home/user/MyDocs/core-dumps"
+    else
+	logger "rich-core: less than 20M free in core location"
+    fi
+fi
+
+if [ x"${core_location}" = x ]; then
+  cat > /dev/null
+  logger "rich-core: no core location - not dumping"
+  exit
+fi
+
+#check that we have the vfat partition mounted before trying to dump to it
+if ! _MyDocs_mounted_to_vfat; then 
+    logger "rich-core: MyDocs not mounted to vfat partition - not dumping"
+    cat > /dev/null
+    exit
+fi
+
+# when core reducing is enabled, coredump is written temporarily on disk.
+# therefore space left must be checked
+if [ -n "${core_pid}" -a "${REDUCE_CORE}" = "true" ]; then
+  _get_vmsizes ${core_pid}
+
+  if [ -z "${vmsize}" -o -z "${vmlib}" -o -z "${vmexe}" ]; then
+    logger "rich-core: could not get virtual memory information of process - not dumping"
+    cat > /dev/null
+    exit
+  fi
+
+  # calculate approximate size of core file
+  coresize_approx=$((${vmsize}-${vmlib}-${vmexe}))
+
+  if [ $((${freespace} - ${coresize_approx})) -lt 50000 ]; then
+    # not enough free space for input core file + required extra 50M
+    omit_core=true
+    logger "rich-core: dumping core might fill up disk - not dumping"
+  elif [ ${coresize_approx} -gt ${CORE_SIZE_LIMIT} ]; then
+    # approximated size of input core file is greater than the limit
+    omit_core=true
+    logger "rich-core: approximate of core size is greater than ${CORE_SIZE_LIMIT} kB - not dumping"
+  fi
+fi
+
+# If invoked from command line, we won't have a valid pid, so a dummy
+# value is assigned instead
+
+if [ x"$NO_SECTION_HEADER" = x"true" ] && [ -z ${core_pid} ]; then
+   core_pid=0
+fi
+
+# figure out the executable
+core_exe=`readlink -f /proc/${core_pid}/exe`
+core_exe_basename=${core_exe##*/}
+
+# if process is invoker, don't create a core
+
+if [ x"${core_exe_basename}" = x"invoker" ]; then
+   cat > /dev/null
+   exit
+fi
+
+# Only attempt to find the core name if we have a valid PID, try
+# alternatives if this is not the case.
+
+if [ "${core_pid}" -gt 0 ]; then
+core_tmp=`tr '\0' ' ' < /proc/${core_pid}/cmdline | cut -d' ' -f1`
+core_name=${core_tmp##*/}
+fi
+
+if [ -z "${core_name}" ]; then
+  if [ -n "${core_exe_basename}" ]; then
+    core_name="${core_exe_basename}"
+  else
+    core_name="$DEFAULT_CORE_NAME"
+  fi
+fi
+
+# Check whether the dump request can be discarded based
+# on white/blacklisting rules.
+
+if [ -e /etc/rich-core.include ]; then
+    /bin/grep -q "^[[:space:]]*${core_name}[[:space:]]*$" /etc/rich-core.include
+    if [ $? -ne 0 ]; then
+        # Not in the whitelist; do not dump a core
+        cat > /dev/null
+        exit
+    fi
+fi
+if [ -e /etc/rich-core.exclude ]; then
+    /bin/grep -q "^[[:space:]]*${core_name}[[:space:]]*$" /etc/rich-core.exclude
+    if [ $? -eq 0 ]; then
+        # Is in the blacklist; do not dump a core
+        cat > /dev/null
+        exit
+    fi
+fi
+
+# Check if core reducing is disabled for certain executables based on core_name
+if [ -f /etc/rich-core/disable-reducer/${core_name} ]; then
+    REDUCE_CORE=false
+fi
+
+# We will lack the value for the signal if we're invoked from the
+# script. Provide a dummy value in that case.
+
+if [ -z "${core_sig}" ]; then
+  core_sig=0
+fi
+
+# Make a unique HW ID from IMEI
+imei_suffix=$(sysinfoclient -p /certs/npc/esn/gsm 2>/dev/null)
+if [ -z ${imei_suffix} -o "${imei_suffix}" = "<error>" ]; then
+    /usr/sbin/sysinfod --static
+    imei_suffix=$(awk -F '=' '/^\/certs\/npc\/esn\/gsm=/{print $2}' /var/cache/sysinfod/values)
+    if [ -z ${imei_suffix} ]; then
+        imei_suffix="xxxx"
+    fi
+fi
+
+# Get OneNAND vendor ID
+vendor_id=$(cat /sys/devices/platform/omap2-onenand/manfid)
+if [ -z "${vendor_id}" ]; then
+  vendor_id="NA"
+fi
+
+# Get hwid
+hwid=$(sysinfoclient -p /component/hw-build 2>dev/null)
+ 
+# Make a naming distinction between oopslogs and rich-cores
+if [ -n "${IS_OOPSLOG}" ]; then
+	timestamp=$(date +%F-%S)
+	rcorefilename=${core_location}/oopslog-${imei_suffix}-${vendor_id}-${hwid}-${timestamp}
+else
+	rcorefilename=${core_location}/${core_name}-${imei_suffix}-${vendor_id}-${hwid}-${core_sig}-${core_pid}
+fi
+
+# Collect process specific information first, only then system
+# as process may disappear while this info is collected
+(
+if [ -z "${IS_OOPSLOG}" ] && [ "${core_pid}" -gt 0 ]; then
+  _section_cmdline
+  _section_ls_proc
+  _section_proc_fd
+  _section_proc_smaps
+fi
+  _section_date
+  # _section_software_version
+  _section_component_version
+  _section_df
+  _section_ifconfig
+  _section_extra_files
+
+if [ -z "${IS_OOPSLOG}" ]; then
+    _section_slabinfo
+    # disable xmeminfo for now as it may hang
+    # _section_xmeminfo
+    _section_proc2csv
+fi
+if [ x"$INCLUDE_SYSLOG" = x"true" ]; then
+  _section_syslog
+fi
+  _section_product_info
+if [ x"$INCLUDE_PKGLIST" = x"true" ]; then
+  _section_packagelist
+fi
+if [ x"$NO_SECTION_HEADER" = x"true" -a "${omit_core}" != "true" ]; then
+cat
+elif [ -n "${IS_OOPSLOG}" ]; then
+  _print_header oopslog
+  cat
+else 
+  if [ x"$INCLUDE_CORE" = x"true" -a "${omit_core}" != "true" ]; then
+    _print_header coredump
+      if [ x"$REDUCE_CORE" = x"true" ] && [ -n ${core_exe} ]; then
+		originalcorefilename=${rcorefilename}.core.in
+		cat > ${originalcorefilename}
+		core-reducer -i ${originalcorefilename} -o /dev/stdout -e ${core_exe}
+		rm ${originalcorefilename}	
+      else
+        cat
+      fi
+  fi
+fi
+_section_rich_core_errors
+) | lzop > ${rcorefilename}.tmp
+
+mv ${rcorefilename}.tmp ${rcorefilename}.rcore.lzo
+
+# count cores per application
+if [ ! -d /var/lib/dsme/rich-cores ]; then
+    mkdir -p /var/lib/dsme/rich-cores;
+fi
+counterfile=/var/lib/dsme/rich-cores/${core_name}
+echo $(($(cat $counterfile 2>/dev/null)+1)) > $counterfile
+

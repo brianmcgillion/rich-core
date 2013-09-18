@@ -1,0 +1,63 @@
+.TH CORE-REDUCER 1 "December 10, 2009" "version 0.1" "USER COMMANDS"
+.SH NAME
+core-reducer \- reduce the size of a core dump, to enable sending over network
+.SH SYNOPSIS
+.B core-reducer
+\-i infile [\-h] \-o outfile \-e exec [\-a addr] [\-m maps] [-s]
+.SH DESCRIPTION
+When an unhandled exception or signal occurs in an application there
+is the potential for a core dump to be generated.  These core dumps
+contain a large portion of the applications virtual address space and
+as a consequence can be very large, running to hundreds of MB's.  When
+received by a developer these are a very useful tool for debugging an 
+application, however many cases arise when the core is dumped on an end
+users machine.  It is preferrable to get this core dump to try and diagnose
+the problem, however the transfer of such a large file accross a potentially
+slow network connection is not feasable.
+.PP
+core-reducer attempts to solve this problem by reducing the amount of data
+that is stored in a core dump.  By default it stores the Notes section, which
+contains the register states of the application, the Stacks and the link map 
+that is created by the dynamic linker.  This information is sufficient to 
+provide statistical analysis and give an indication as to the problem that
+has cause the application to fail.
+.SH OPTIONS
+.TP
+\-h
+Display help text
+.TP
+\-i
+The large core file that is to be processed.
+.TP
+\-e
+The full path to the executable that has just crashed
+.TP
+\-a
+An unused portion of the virtual memory address space of the application
+that can be used for constructing the debug link map data in.  The address
+of the heap from the /proc/$pid/maps can safely be used for this purpose.
+.TP
+\-o
+The output file where the result of the procesing will be placed.
+.TP
+\-m
+The maps file that should be used for backend post processing.
+.TP
+\-s
+Take only the stacks and notes section from the origional core dump file. 
+This will ignore the linkmap.
+.SH EXIT STATUS
+.B core-reducer
+Exits with a status of 0 if there were no error encountered. On error
+.B core-reducer
+exists with a non zero status. Errors will be logged to syslog.
+.SH AUTHOR
+Written by Brian McGillion and Denis Mingulov
+.SH SEE ALSO
+proc(5), elf(5)
+.SH COPYRIGHT
+Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+.PP
+This is free software.  You may redistribute copies of it under the
+terms of the GNU General Public License v2 included with the software.
+There is NO WARRANTY, to the extent permitted by law.

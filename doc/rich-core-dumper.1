@@ -1,0 +1,91 @@
+.TH RICH-CORE-DUMPER 1 "2008-05-27" "sp-rich-core"
+.SH NAME
+rich-core-dumper \- Create a rich core or oopslog dump
+.SH SYNOPSIS
+.B rich-core-dumper [ \fI\-\-no\-section\-header\fr]
+.SH DESCRIPTION
+.B rich-core-dumper
+gathers some metadata from the system (including but not limited to syslog,
+amount of free space on various partitions, software version etc) and creates
+a compressed rich core dump from it and the original core dump which it
+receives from stdin. Rich-core-dumper can also be used to generate other kinds of dumps, which currently includes oopslog dumps and custom dumps. Oopslog dumps, are otherwise similar to rich core dumps, but contain kernel OOPS data in place of a core dump. Finally, custom dumps can be used to store any custom data instead of oopslog or core dump data.
+
+.PP
+While creating a rich core, an oopslog or custom dump, the rich-core-dumper expects that /home/user/MyDocs/core-dumps directory exists. Directory needs to have at least 20 MB of space left. When core reducing is used and approximate size of coredump is greater than 500 MB or space left on device after a temporary coredump has been written would be less than 50 MB, then coredump is not included in rich core.
+.PP
+Please note that if neither directory exists, the cores are silently
+discarded; the rich-core-dumper does not attempt to create the directories
+by itself. I.e. the existence of these directories can be used to enable
+and disable core dumping. In case of of oopslogs, the dumping is attempted again when the rich-core initscript is executed, typically during a boot.
+.PP
+Rich-core-dumper also creates simple statistics about crashes by maintaining per-application counters for the amount of created rich cores. The counters are stored on filesystem (see FILES section below).
+.PP
+The rich-core-dumper has some privacy-related configurable options. The main configuration file can contain the following options in KEY=value format (lowercase should be used for the values):
+.IP "\fBINCLUDE_CORE\fR" 4
+Valid values for this setting are \fBtrue\fR and \fBfalse\fR. With value of n, no actual core dumps from crashes are included in the resulting rich-core files. If this key is not set in configuration file, core dumps will be included by default. 
+.IP "\fBINCLUDE_SYSLOG\fR" 4
+Valid values for this setting are \fBtrue\fR and \fBfalse\fR. With value of n, no syslog files are included in the resulting rich-core files. If this key is not set in the configuration file, syslogs will be included by default.
+.IP "\fBINCLUDE_PKGLIST\fR" 4
+Valid values for this setting are \fBtrue\fR and \fBfalse\fR. With value of n, no list of packages installed on the system is included in the resulting rich-core file. If this key is not set in the configuration file, the list of packages is included by default.
+.PP
+In addition to the above, there can be whitelist and/or blacklist files /etc/rich-core.include and /etc/rich-core.exclude respectively. The format of the filterlist file is simple; each line of the file should contain exactly one application binary name (without path) that should be filtered. A simple example filterlist file is given below.
+.PP
+To include additional files in rich core, user can define a list of those files in /etc/rich-core/default.extras. If extra files are required only for rich cores of certain process PROC, then a file /etc/rich-core/PROC.extras must be used. The format of the list files is one file name per line and the names support shell wild card expansion.
+.SH OPTIONS
+.TP
+.B \-\-no\-section\-header
+With this option, the rich-core-dumper can be invoked from other scripts or applications. It will expect to receive via stdin both a custom section header (generally, the follwowing format should be used: \fB[\-\-\-rich-core: yoursectionname\-\-\-]\fR) and the corresponding data, which will then be stored in place of the oopslog or core dump data. Multiple custom sections can be appended to the dump as long as all data is pushed in during the same invocation of rich-core-dumper. It is also possible to control the naming of the dumps by setting environmental variables \fBCORE_EXE\fR, \fBCORE_SIG\fR and \fBCORE_PID\fR prior to the invocation of the dumper.
+.TP
+.B \-\-default\-name \fIname\fP
+This option specifies the default \fIname\fP used when core name cannot be obtained by other means. If not specified such cores are named 'unknown'.
+.PP
+.SH EXAMPLES
+.PP 
+An example rich-core configuration file that prevents syslogs, core dumps and list of installed packages from being included in rich-core files to increase privacy:
+.PP
+.RS
+  INCLUDE_CORE=false
+  INCLUDE_SYSLOG=false
+  INCLUDE_PKGLIST=false
+.RE
+.PP 
+An example filterlist (see FILES section for filesystem location):
+.PP
+.RS
+osso-media-server
+.br
+hildon-input-method
+.RE
+.PP
+If such a list is given as a whitelist, only the osso-media-server and hildon-input-method crashes will produce rich cores with the above example.
+.SH FILES
+.IP "\fB/usr/share/crash-reporter-settings/crash-reporter-privacy.conf\fR" 4
+The Crash Reporter configuration file for privacy options.
+.IP "\fB$HOME/crash-reporter-privacy.conf\fR" 4
+User private copy of above, changed via configuration.
+.IP "\fB/etc/rich-core.include\fR" 4
+.IP "\fB/etc/rich-core.exclude\fR" 4
+List of executables that are to be white- or blacklisted for rich-core dump generation.
+.IP "\fB/etc/rich-core/default.extras\fR" 4
+List of additional files included in rich-core
+.IP "\fB/etc/rich-core/PROC.extras\fR" 4
+List of additional files included in rich-core when process PROC causes core creation.
+.IP "\fB/etc/init.d/rich-core\fR" 4
+Script to enable and disable rich core and oopslog dumping
+.IP "\fB/proc/sys/kernel/core_pattern\fR" 4
+Contains a pattern for core dump filenames. If it begins with a pipe
+character, specified command is executed with core dump passed into
+stdin.
+.IP "\fB/var/lib/dsme/rich-cores/\fR" 4
+The per-application rich core counter file storage directory.
+.SH SEE ALSO
+rich-core-extract(1)
+.br
+.SH COPYRIGHT
+Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+.PP
+This is free software.  You may redistribute copies of it under the
+terms of the GNU General Public License v2 included with the software.
+There is NO WARRANTY, to the extent permitted by law.
+
+

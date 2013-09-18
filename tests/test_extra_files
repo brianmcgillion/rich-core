@@ -1,0 +1,393 @@
+#!/bin/sh
+
+EXTRAS_FILE=/etc/rich-core/sleep.extras
+DEFAULT_EXTRAS_FILE=/etc/rich-core/default.extras
+ret=0
+
+test_case_1()
+{
+    cat > /tmp/foo.txt <<EOF
+abc
+def
+EOF
+
+    cat > /tmp/bar.txt <<EOF
+0123456789
+EOF
+
+    cat > /tmp/default.txt <<EOF
+rich-core test file
+EOF
+
+    cat > ${EXTRAS_FILE} <<EOF
+/tmp/foo.txt
+/tmp/bar.txt
+EOF
+
+    cat > ${DEFAULT_EXTRAS_FILE} <<EOF
+/tmp/default.txt
+EOF
+
+    rm -f /home/user/MyDocs/core-dumps/sleep-*.rcore.lzo
+    rm -fr ./outputdir
+
+    sleep 60&
+    PID=$!
+    echo "started sleep process with PID $PID"
+    sleep 1
+    kill -SEGV ${PID}
+    wait ${PID}
+    sleep 5
+
+    if rich-core-extract /home/user/MyDocs/core-dumps/sleep-*-${PID}.rcore.lzo outputdir; then
+	if [ ! -f ./outputdir/foo.txt ]; then
+	    echo "ERROR: file foo.txt is missing from rich core"
+	    return 1
+	elif ! diff /tmp/foo.txt ./outputdir/foo.txt; then
+	    echo "ERROR: contents of file foo.txt in rich core does not match the original"
+	    return 1
+	fi
+
+	if [ ! -f ./outputdir/bar.txt ]; then
+	    echo "ERROR: file bar.txt is missing from rich core"
+	    return 1
+	elif ! diff /tmp/bar.txt ./outputdir/bar.txt; then
+	    echo "ERROR: contents of file bar.txt in rich core does not match the original"
+	    return 1
+	fi
+
+	if [ ! -f ./outputdir/default.txt ]; then
+	    echo "ERROR: file default.txt is missing from rich core"
+	    return 1
+	elif ! diff /tmp/default.txt ./outputdir/default.txt; then
+	    echo "ERROR: contents of file default.txt in rich core does not match the original"
+	    return 1
+	fi
+    else
+	echo "ERROR: rich-core-extract failed"
+	return 1
+    fi
+
+    return 0
+}
+
+test_case_2()
+{
+    cat > /tmp/foo.txt <<EOF
+abc
+def
+EOF
+
+    cat > /tmp/bar.txt <<EOF
+0123456789
+EOF
+
+    cat > /tmp/default.txt <<EOF
+rich-core test file
+EOF
+
+    cat > ${EXTRAS_FILE} <<EOF
+/tmp/foo.txt
+/tmp/bar.txt
+EOF
+
+    rm -f ${DEFAULT_EXTRAS_FILE}
+
+    rm -f /home/user/MyDocs/core-dumps/sleep-*.rcore.lzo
+    rm -fr ./outputdir
+
+    sleep 60&
+    PID=$!
+    echo "started sleep process with PID $PID"
+    sleep 1
+    kill -SEGV ${PID}
+    wait ${PID}
+    sleep 5
+
+    if rich-core-extract /home/user/MyDocs/core-dumps/sleep-*-${PID}.rcore.lzo outputdir; then
+	if [ ! -f ./outputdir/foo.txt ]; then
+	    echo "ERROR: file foo.txt is missing from rich core"
+	    return 1
+	elif ! diff /tmp/foo.txt ./outputdir/foo.txt; then
+	    echo "ERROR: contents of file foo.txt in rich core does not match the original"
+	    return 1
+	fi
+
+	if [ ! -f ./outputdir/bar.txt ]; then
+	    echo "ERROR: file bar.txt is missing from rich core"
+	    return 1
+	elif ! diff /tmp/bar.txt ./outputdir/bar.txt; then
+	    echo "ERROR: contents of file bar.txt in rich core does not match the original"
+	    return 1
+	fi
+
+	if [ -f ./outputdir/default.txt ]; then
+	    echo "ERROR: file default.txt should not be included in rich core"
+	    return 1
+	fi
+    else
+	echo "ERROR: rich-core-extract failed"
+	return 1
+    fi
+
+    return 0
+}
+
+test_case_3()
+{
+    cat > /tmp/foo.txt <<EOF
+abc
+def
+EOF
+
+    rm -f /tmp/bar.txt
+
+    cat > /tmp/default.txt <<EOF
+rich-core test file
+EOF
+
+    cat > ${EXTRAS_FILE} <<EOF
+/tmp/foo.txt
+/tmp/bar.txt
+EOF
+
+    cat > ${DEFAULT_EXTRAS_FILE} <<EOF
+/tmp/default.txt
+EOF
+
+    rm -f /home/user/MyDocs/core-dumps/sleep-*.rcore.lzo
+    rm -fr ./outputdir
+
+    sleep 60&
+    PID=$!
+    echo "started sleep process with PID $PID"
+    sleep 1
+    kill -SEGV ${PID}
+    wait ${PID}
+    sleep 5
+
+    if rich-core-extract /home/user/MyDocs/core-dumps/sleep-*-${PID}.rcore.lzo outputdir; then
+	if [ ! -f ./outputdir/foo.txt ]; then
+	    echo "ERROR: file foo.txt is missing from rich core"
+	    return 1
+	elif ! diff /tmp/foo.txt ./outputdir/foo.txt; then
+	    echo "ERROR: contents of file foo.txt in rich core does not match the original"
+	    return 1
+	fi
+
+	if [ -f ./outputdir/bar.txt ]; then
+	    echo "ERROR: file bar.txt should not be included in rich core"
+	    return 1
+	fi
+
+	if [ ! -f ./outputdir/default.txt ]; then
+	    echo "ERROR: file default.txt is missing from rich core"
+	    return 1
+	elif ! diff /tmp/default.txt ./outputdir/default.txt; then
+	    echo "ERROR: contents of file default.txt in rich core does not match the original"
+	    return 1
+	fi
+    else
+	echo "ERROR: rich-core-extract failed"
+	return 1
+    fi
+
+    return 0
+}
+
+test_case_4()
+{
+    rm -f ${EXTRAS_FILE}
+    rm -f ${DEFAULT_EXTRAS_FILE}
+
+    rm -f /home/user/MyDocs/core-dumps/sleep-*.rcore.lzo
+    rm -fr ./outputdir
+
+    sleep 60&
+    PID=$!
+    echo "started sleep process with PID $PID"
+    sleep 1
+    kill -SEGV ${PID}
+    wait ${PID}
+    sleep 5
+
+    if rich-core-extract /home/user/MyDocs/core-dumps/sleep-*-${PID}.rcore.lzo outputdir; then
+	if [ ! -f ./outputdir/cmdline ]; then
+	    echo "ERROR: file cmdline is missing from rich core"
+	    return 1
+	fi
+    else
+	echo "ERROR: rich-core-extract failed"
+	return 1
+    fi
+
+    return 0
+}
+
+test_case_5()
+{
+    cat > /tmp/foo.txt <<EOF
+abc
+def
+EOF
+
+    cat > /tmp/bar.txt <<EOF
+0123456789
+EOF
+
+    cat > /tmp/bar.log <<EOF
+log file
+EOF
+
+    cat > /tmp/default.txt <<EOF
+rich-core test file
+EOF
+
+    cat > /tmp/default.foobar <<EOF
+default foobar file
+for rich-core testing
+contains several lines :)
+EOF
+
+    cat > ${EXTRAS_FILE} <<EOF
+/tmp/foo.txt
+/no/such/file
+/tmp/bar.*
+EOF
+
+    cat > ${DEFAULT_EXTRAS_FILE} <<EOF
+/tmp/default.txt
+/tmp/*.foobar
+nosuchfiles*
+/tmp/default.*.gz
+EOF
+
+    tar czf /tmp/default.foobar.tar.gz /tmp/default.foobar
+
+    rm -f /home/user/MyDocs/core-dumps/sleep-*.rcore.lzo
+    rm -fr ./outputdir
+
+    sleep 60&
+    PID=$!
+    echo "started sleep process with PID $PID"
+    sleep 1
+    kill -SEGV ${PID}
+    wait ${PID}
+    sleep 5
+
+    if rich-core-extract /home/user/MyDocs/core-dumps/sleep-*-${PID}.rcore.lzo outputdir; then
+	if [ ! -f ./outputdir/foo.txt ]; then
+	    echo "ERROR: file foo.txt is missing from rich core"
+	    return 1
+	elif ! diff /tmp/foo.txt ./outputdir/foo.txt; then
+	    echo "ERROR: contents of file foo.txt in rich core does not match the original"
+	    return 1
+	fi
+
+	if [ ! -f ./outputdir/bar.txt ]; then
+	    echo "ERROR: file bar.txt is missing from rich core"
+	    return 1
+	elif ! diff /tmp/bar.txt ./outputdir/bar.txt; then
+	    echo "ERROR: contents of file bar.txt in rich core does not match the original"
+	    return 1
+	fi
+
+	if [ ! -f ./outputdir/bar.log ]; then
+	    echo "ERROR: file bar.log is missing from rich core"
+	    return 1
+	elif ! diff /tmp/bar.log ./outputdir/bar.log; then
+	    echo "ERROR: contents of file bar.log in rich core does not match the original"
+	    return 1
+	fi
+
+	if [ ! -f ./outputdir/default.txt ]; then
+	    echo "ERROR: file default.txt is missing from rich core"
+	    return 1
+	elif ! diff /tmp/default.txt ./outputdir/default.txt; then
+	    echo "ERROR: contents of file default.txt in rich core does not match the original"
+	    return 1
+	fi
+
+	if [ ! -f ./outputdir/default.foobar ]; then
+	    echo "ERROR: file default.foobar is missing from rich core"
+	    return 1
+	elif ! diff /tmp/default.foobar ./outputdir/default.foobar; then
+	    echo "ERROR: contents of file default.foobar in rich core does not match the original"
+	    return 1
+	fi
+
+	if [ ! -f ./outputdir/default.foobar.tar.gz ]; then
+	    echo "ERROR: file default.foobar.tar.gz is missing from rich core"
+	    return 1
+	elif ! diff /tmp/default.foobar.tar.gz ./outputdir/default.foobar.tar.gz; then
+	    echo "ERROR: contents of file default.foobar.tar.gz in rich core does not match the original"
+	    return 1
+	fi
+    else
+	echo "ERROR: rich-core-extract failed"
+	return 1
+    fi
+
+    return 0
+}
+
+### MAIN ###
+
+mkdir -p /etc/rich-core
+
+if [ -f ${DEFAULT_EXTRAS_FILE} ]; then
+    echo "Backup original ${DEFAULT_EXTRAS_FILE}"
+    cp -p ${DEFAULT_EXTRAS_FILE} ${DEFAULT_EXTRAS_FILE}.bak
+fi
+
+echo "Rich core extra files: Test case 1"
+if test_case_1; then
+    echo "Test case 1 PASSED"
+else
+    echo "Test case 1 FAILED"
+    ret=1
+fi
+
+echo "Rich core extra files: Test case 2"
+if test_case_2; then
+    echo "Test case 2 PASSED"
+else
+    echo "Test case 2 FAILED"
+    ret=1
+fi
+
+echo "Rich core extra files: Test case 3"
+if test_case_3; then
+    echo "Test case 3 PASSED"
+else
+    echo "Test case 3 FAILED"
+    ret=1
+fi
+
+echo "Rich core extra files: Test case 4"
+if test_case_4; then
+    echo "Test case 4 PASSED"
+else
+    echo "Test case 4 FAILED"
+    ret=1
+fi
+
+echo "Rich core extra files: Test case 5"
+if test_case_5; then
+    echo "Test case 5 PASSED"
+else
+    echo "Test case 5 FAILED"
+    ret=1
+fi
+
+# clean created files and directories
+rm -fr ${DEFAULT_EXTRAS_FILE} ${EXTRAS_FILE} ./outputdir /tmp/foo.txt /tmp/bar.txt /tmp/bar.log /tmp/default.txt /tmp/default.foobar /tmp/default.foobar.tar.gz
+
+if [ -f ${DEFAULT_EXTRAS_FILE}.bak ]; then
+    echo "Restore original ${DEFAULT_EXTRAS_FILE}"
+    cp -p ${DEFAULT_EXTRAS_FILE}.bak ${DEFAULT_EXTRAS_FILE}
+    rm -f ${DEFAULT_EXTRAS_FILE}.bak
+fi
+
+echo "$0 exiting with return value $ret"
+exit $ret
